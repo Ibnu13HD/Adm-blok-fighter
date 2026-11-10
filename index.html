@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Blok Fight 3D</title>
+<style>
+:root{--bg:#eef1f7;--ink:#1a2140;--mute:#555e80;--line:#d3d9ea;--arena:#2a2470;--gold:#f2b417;--dia:#0f6ea8;--coin:#8f5a06;--bad:#b3243b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{min-height:44px;padding:0 16px;border:1px solid #9aa3c4;border-radius:10px;background:#fff;cursor:pointer;font-weight:600}
+button.p{background:var(--arena);border-color:var(--arena);color:#fff}
+button.d{color:var(--bad);border-color:var(--bad)}
+input:not([type=checkbox]),select,textarea{min-height:44px;width:100%;padding:8px 12px;border:1px solid #9aa3c4;border-radius:10px;background:#fff}
+:focus-visible{outline:3px solid #e69a00;outline-offset:2px}
+[hidden]{display:none!important}
+.sr{position:absolute;left:-9999px}
+.w{max-width:860px;margin:0 auto;padding:16px}
+header{background:var(--arena);color:#fff;border-bottom:4px solid var(--gold)}
+header .w{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:12px 16px}
+header h1{font-size:1.15rem;margin:0;flex:1 1 auto}
+header small{opacity:.85;word-break:break-all}
+header button{background:transparent;color:#fff;border-color:#fff}
+#login{text-align:center;padding-top:14vh}
+#login h1{font-size:1.6rem;margin:0 0 8px}
+#lerr{color:var(--bad);font-weight:600}
+nav{display:flex;gap:8px;margin-bottom:12px}
+nav button{flex:1}
+nav [aria-pressed=true]{background:var(--arena);border-color:var(--arena);color:#fff}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.st div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.st b{display:block;font-size:1.7rem;line-height:1.15;font-weight:800;font-variant-numeric:tabular-nums}
+.st span{color:var(--mute);font-size:.9rem}
+#sD{color:var(--dia)}#sC{color:var(--coin)}
+.ic{width:1.1em;height:1.1em;vertical-align:-.15em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.bar>input{flex:2 1 180px}.bar>select{flex:1 1 140px}
+#list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+#list li{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding-left:12px}
+#list li.em{padding:16px;color:var(--mute)}
+#list input{width:22px;height:22px;flex:none}
+.row{flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;gap:0 10px;text-align:left;border:0;background:none;padding:10px 12px;font-weight:400}
+.row b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row small{grid-row:2;color:var(--mute)}
+.am{grid-row:1/3;grid-column:2;align-self:center;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+dialog{width:min(440px,94vw);border:0;border-radius:16px;padding:20px;color:var(--ink)}
+dialog::backdrop{background:rgba(20,24,50,.55)}
+dialog h2{margin:0 0 4px;font-size:1.2rem}
+dialog form{display:grid;gap:10px}
+dialog label{display:grid;gap:4px;font-weight:600}
+.fl{display:grid;gap:10px}
+.ac{display:flex;gap:8px;flex-wrap:wrap}.ac button{flex:1}
+code{background:#e3e7f4;padding:1px 6px;border-radius:6px;word-break:break-all}
+#rules{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:pre;overflow:auto;margin:10px 0}
+#toast{position:fixed;left:12px;right:12px;bottom:12px;max-width:560px;margin:0 auto;padding:12px 16px;border-radius:12px;background:var(--ink);color:#fff;font-weight:600;z-index:9}
+#toast.bad{background:var(--bad)}
+#toast:empty{visibility:hidden}
+li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="d" viewBox="0 0 32 32"><polygon points="9,4 23,4 29,12 16,29 3,12" fill="#4fd8ff" stroke="#1a86c4" stroke-width="1.6" stroke-linejoin="round"/><polygon points="9,4 13,12 3,12" fill="#a8efff"/><polygon points="23,4 19,12 29,12" fill="#2aa6e0"/><polygon points="13,12 19,12 16,29" fill="#1a86c4"/></symbol><symbol id="c" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#ffc933" stroke="#b9780f" stroke-width="1.6"/><circle cx="16" cy="16" r="9" fill="none" stroke="#b9780f" stroke-width="2"/></symbol></svg>
+<div id="toast" role="status"></div>
+
+<main id="login" class="w">
+  <h1>Admin Blok Fight 3D</h1>
+  <p>Kelola diamond, koin, dan akun pemain di Firebase proyek <b>blokfighter</b>.</p>
+  <button id="in" class="p">Masuk dengan Google</button>
+  <p id="lerr" role="alert"></p>
+</main>
+
+<div id="app" hidden>
+  <header><div class="w">
+    <h1>Admin Blok Fight 3D</h1>
+    <small id="who"></small>
+    <button id="out">Keluar</button>
+  </div></header>
+  <div class="w">
+    <nav aria-label="Bagian">
+      <button data-t="A" aria-pressed="true">Akun</button>
+      <button data-t="S" aria-pressed="false">Pengaturan</button>
+    </nav>
+
+    <section id="tA" aria-label="Akun pemain">
+      <div class="st">
+        <div><b id="sD"></b><span><svg class="ic" aria-hidden="true"><use href="#d"/></svg> Total diamond</span></div>
+        <div><b id="sC"></b><span><svg class="ic" aria-hidden="true"><use href="#c"/></svg> Total koin</span></div>
+        <div><b id="sA"></b><span>Akun dimuat</span></div>
+      </div>
+      <div class="bar">
+        <input id="q" type="search" placeholder="Cari nama atau UID" aria-label="Cari nama atau UID">
+        <select id="sort" aria-label="Urutkan">
+          <option value="dm">Diamond terbanyak</option><option value="co">Koin terbanyak</option>
+          <option value="wins">Kemenangan terbanyak</option><option value="rk">Rank tertinggi</option>
+          <option value="new">Terbaru diperbarui</option><option value="name">Nama A-Z</option>
+        </select>
+      </div>
+      <div class="bar">
+        <span id="nsel" aria-live="polite"></span>
+        <button id="bTop">Pilih semua yang tampil</button>
+        <button id="bNone">Kosongkan</button>
+        <button id="bGift" class="p">Beri hadiah</button>
+      </div>
+      <ul id="list" aria-label="Daftar akun"></ul>
+      <div class="bar">
+        <button id="more">Muat semua akun</button>
+        <button id="reload">Muat ulang</button>
+        <button id="csv">Ekspor CSV</button>
+      </div>
+    </section>
+
+    <section id="tS" hidden aria-label="Pengaturan">
+      <h2>Pengaturan Firebase</h2>
+      <p>UID kamu: <code id="uid"></code></p>
+      <ol>
+        <li>Firebase Console &gt; Authentication &gt; Settings &gt; Authorized domains: tambahkan domain tempat file ini dibuka. Login Google tidak jalan jika file dibuka langsung dari penyimpanan perangkat.</li>
+        <li><b>Wajib sebelum mengubah diamond atau koin:</b> salin rules di bawah, lalu Firestore Database &gt; Rules &gt; Publish. Tanpa ini, pemain yang profilnya sudah berisi <code>dm</code> atau <code>co</code> gagal menyimpan nama, kemenangan, dan rank.</li>
+        <li>Diamond disimpan di field <code>dm</code>, koin di <code>co</code>, pada <code>profiles/{uid}</code>. Pemain tidak bisa mengubahnya sendiri. Game harus membaca dua field ini agar angkanya tampil di menu.</li>
+      </ol>
+      <textarea id="rules" readonly rows="14" aria-label="Firestore Security Rules"></textarea>
+      <button id="cp" class="p">Salin rules</button>
+    </section>
+  </div>
+</div>
+
+<dialog id="dEdit" aria-labelledby="hE">
+  <form id="fEdit">
+    <div><h2 id="hE">Ubah akun</h2><code id="eid"></code></div>
+    <div class="fl"></div>
+    <div class="ac"><button class="p">Simpan</button><button type="button" id="xE">Batal</button></div>
+    <button type="button" id="bDel" class="d">Hapus akun</button>
+  </form>
+</dialog>
+
+<dialog id="dGift" aria-labelledby="hG">
+  <form id="fGift">
+    <h2 id="hG">Beri hadiah</h2>
+    <label>Penerima<select name="who"></select></label>
+    <label>Tambah diamond<input name="dm" type="number" min="0" step="1" value="0" inputmode="numeric"></label>
+    <label>Tambah koin<input name="co" type="number" min="0" step="1" value="0" inputmode="numeric"></label>
+    <div class="ac"><button class="p">Kirim</button><button type="button" id="xG">Batal</button></div>
+  </form>
+</dialog>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:'AIzaSyDFAYM3a2mw0LcO-JgdjJ2VS14UUmwXd8Y',authDomain:'blokfighter.firebaseapp.com',projectId:'blokfighter',appId:'1:999950264904:web:84b8be568f1251acf6c67d'});
+const auth=firebase.auth(),db=firebase.firestore(),FV=firebase.firestore.FieldValue,P=id=>db.collection('profiles').doc(id);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const n0=v=>Math.max(0,Math.floor(+v)||0),fmt=n=>n.toLocaleString('id-ID');
+const RK=['WARIOR III','WARIOR II','WARIOR I','MASTER III','MASTER II','MASTER I','GRANDMASTER V','GRANDMASTER III','GRANDMASTER II','GRANDMASTER I','LEGEND VI','LEGEND V','LEGEND III','LEGEND II','LEGEND I','IMORTAL'];
+const FD=[['name','Nama (2 sampai 16 huruf)',1],['dm','Diamond'],['co','Koin'],['wins','Kemenangan'],['rk','Rank'],['st','Bintang di rank itu']];
+let rows=[],shown=[],last=null,done=false,sel=new Set(),cur,tt;
+
+const toast=(t,bad)=>{const e=$('#toast');e.className=bad?'bad':'';e.textContent=t;clearTimeout(tt);tt=setTimeout(()=>e.textContent='',7000)};
+const err=e=>({'permission-denied':'Ditolak Security Rules. Buka tab Pengaturan dan pasang rules terbaru.','auth/unauthorized-domain':'Domain ini belum diizinkan. Tambahkan di Authentication > Settings > Authorized domains.','auth/popup-closed-by-user':'Jendela login ditutup sebelum selesai.','auth/popup-blocked':'Popup diblokir browser. Izinkan popup lalu coba lagi.'}[e.code]||e.message||String(e));
+
+// ---- Login ----
+$('#in').onclick=async()=>{$('#lerr').textContent='';try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){$('#lerr').textContent=err(e)}};
+$('#out').onclick=()=>auth.signOut();
+auth.onAuthStateChanged(u=>{
+  $('#login').hidden=!!u;$('#app').hidden=!u;
+  if(!u){rows=[];return}
+  $('#who').textContent=u.email||u.uid;$('#uid').textContent=u.uid;$('#rules').value=RULES(u.uid);reset();
+});
+
+// ---- Data ----
+async function page(){let q=db.collection('profiles').limit(100);if(last)q=q.startAfter(last);const s=await q.get();s.docs.forEach(d=>rows.push({id:d.id,...d.data()}));if(s.size)last=s.docs[s.size-1];if(s.size<100)done=true}
+async function load(all){try{do{await page()}while(all&&!done)}catch(e){toast(err(e),1)}view()}
+function reset(){rows=[];last=null;done=false;sel.clear();load(false)}
+
+const rn=r=>RK[Math.min(15,r.rk|0)]+', '+(r.st||0)+' bintang';
+const row=r=>`<li><input type="checkbox" data-i="${esc(r.id)}" aria-label="Pilih ${esc(r.name)}"${sel.has(r.id)?' checked':''}><button class="row" data-i="${esc(r.id)}" aria-label="${esc(`${r.name||'Tanpa nama'}. ${rn(r)}. ${r.wins||0} menang. Diamond ${r.dm||0}. Koin ${r.co||0}. Buka untuk mengubah.`)}"><b>${esc(r.name||'(tanpa nama)')}</b><small>${rn(r)} · ${r.wins||0} menang</small><span class="am"><svg class="ic" aria-hidden="true"><use href="#d"/></svg> ${fmt(r.dm||0)} <svg class="ic" aria-hidden="true"><use href="#c"/></svg> ${fmt(r.co||0)}</span></button></li>`;
+
+function view(){
+  const k=$('#q').value.trim().toLowerCase(),s=$('#sort').value;
+  const v={dm:r=>r.dm||0,co:r=>r.co||0,wins:r=>r.wins||0,rk:r=>(r.rk||0)*1e4+(r.st||0),new:r=>r.updatedAt?.toMillis?.()||0};
+  shown=rows.filter(r=>!k||(r.name||'').toLowerCase().includes(k)||r.id.toLowerCase().includes(k))
+    .sort(s==='name'?(x,y)=>(x.name||'').localeCompare(y.name||''):(x,y)=>v[s](y)-v[s](x));
+  $('#list').innerHTML=shown.length?shown.map(row).join(''):'<li class="em">Tidak ada akun yang cocok.</li>';
+  $('#sD').textContent=fmt(rows.reduce((t,r)=>t+(r.dm||0),0));
+  $('#sC').textContent=fmt(rows.reduce((t,r)=>t+(r.co||0),0));
+  $('#sA').textContent=fmt(rows.length)+(done?'':'+');
+  $('#more').hidden=done;nsel();
+}
+const nsel=()=>$('#nsel').textContent=sel.size+' dipilih';
+$('#q').oninput=$('#sort').onchange=view;
+$('#more').onclick=()=>load(true);
+$('#reload').onclick=reset;
+$('#list').onclick=e=>{const b=e.target.closest('.row');if(b)openEdit(b.dataset.i)};
+$('#list').onchange=e=>{const i=e.target.dataset.i;if(!i)return;e.target.checked?sel.add(i):sel.delete(i);nsel()};
+$('#bTop').onclick=()=>{shown.forEach(r=>sel.add(r.id));view()};
+$('#bNone').onclick=()=>{sel.clear();view()};
+
+// ---- Ubah & hapus akun ----
+$('#fEdit .fl').innerHTML=FD.map(([k,t,x])=>`<label>${t}${k==='rk'?`<select name="rk">${RK.map((r,i)=>`<option value="${i}">${r}</option>`).join('')}</select>`:`<input name="${k}" ${x?'type="text" required minlength="2" maxlength="16"':'type="number" min="0" step="1" inputmode="numeric"'}>`}</label>`).join('');
+function openEdit(id){
+  cur=rows.find(r=>r.id===id);if(!cur)return;
+  const f=$('#fEdit');FD.forEach(([k])=>f.elements.namedItem(k).value=cur[k]??(k==='name'?'':0));
+  $('#eid').textContent=id;$('#dEdit').showModal();
+}
+$('#xE').onclick=()=>$('#dEdit').close();
+$('#fEdit').onsubmit=async e=>{
+  e.preventDefault();const g=k=>e.target.elements.namedItem(k).value;
+  const d={name:g('name').trim(),dm:n0(g('dm')),co:n0(g('co')),wins:n0(g('wins')),rk:Math.min(15,n0(g('rk'))),st:n0(g('st'))};
+  try{await P(cur.id).set(d,{merge:true});Object.assign(cur,d);$('#dEdit').close();view();toast('Perubahan disimpan.')}catch(x){toast(err(x),1)}
+};
+$('#bDel').onclick=async()=>{
+  if(!confirm(`Hapus akun "${cur.name}"? Profil, daftar teman, dan antrean rank-nya ikut terhapus. Login Google-nya tetap ada di Firebase Authentication.`))return;
+  try{
+    const fs=await P(cur.id).collection('friends').get(),b=db.batch();
+    fs.docs.forEach(d=>{b.delete(d.ref);b.delete(P(d.id).collection('friends').doc(cur.id))});
+    b.delete(db.collection('rankQueue').doc(cur.id));b.delete(P(cur.id));await b.commit();
+    sel.delete(cur.id);rows=rows.filter(r=>r!==cur);$('#dEdit').close();view();toast('Akun dihapus.');
+  }catch(x){toast(err(x),1)}
+};
+
+// ---- Hadiah massal (hanya menambah; untuk mengurangi pakai Ubah akun) ----
+$('#bGift').onclick=()=>{
+  $('#fGift').elements.namedItem('who').innerHTML=(sel.size?`<option value="sel">Akun terpilih (${sel.size})</option>`:'')+`<option value="all">Semua akun${done?' ('+rows.length+')':''}</option>`;
+  $('#dGift').showModal();
+};
+$('#xG').onclick=()=>$('#dGift').close();
+$('#fGift').onsubmit=async e=>{
+  e.preventDefault();const f=e.target,d=n0(f.elements.namedItem('dm').value),c=n0(f.elements.namedItem('co').value);
+  if(!d&&!c)return toast('Isi jumlah diamond atau koin.',1);
+  try{
+    if(f.elements.namedItem('who').value==='all')await load(true);
+    const ids=f.elements.namedItem('who').value==='all'?rows.map(r=>r.id):[...sel];
+    if(!ids.length||!confirm(`Beri ${fmt(d)} diamond dan ${fmt(c)} koin ke ${ids.length} akun?`))return;
+    for(let i=0;i<ids.length;i+=400){const b=db.batch();ids.slice(i,i+400).forEach(id=>b.set(P(id),{dm:FV.increment(d),co:FV.increment(c)},{merge:true}));await b.commit()}
+    const S=new Set(ids);rows.forEach(r=>{if(S.has(r.id)){r.dm=(r.dm||0)+d;r.co=(r.co||0)+c}});
+    $('#dGift').close();view();toast('Hadiah terkirim ke '+ids.length+' akun.');
+  }catch(x){toast(err(x)+' Muat ulang daftar untuk memeriksa hasilnya.',1)}
+};
+
+// ---- Ekspor CSV ----
+$('#csv').onclick=()=>{
+  const q=v=>{v=String(v??'');if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};
+  const t=['uid,nama,diamond,koin,menang,rank,bintang'].concat(rows.map(r=>[r.id,r.name,r.dm||0,r.co||0,r.wins||0,RK[Math.min(15,r.rk|0)],r.st||0].map(q).join(','))).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+t],{type:'text/csv'}));a.download='akun-blokfight.csv';a.click();
+};
+
+// ---- Tab ----
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  $('#tA').hidden=b.dataset.t!=='A';$('#tS').hidden=b.dataset.t!=='S';
+});
+$('#cp').onclick=async()=>{const t=$('#rules');t.select();try{await navigator.clipboard.writeText(t.value);toast('Rules disalin.')}catch(e){toast('Teks sudah terpilih. Salin secara manual.')}};
+
+// ---- Security Rules (rules asli + akses admin + field dm/co hanya bisa diubah admin) ----
+const RULES=u=>`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() { return request.auth != null && request.auth.uid in ['${u}']; }
+    function keep(f) { return request.resource.data.get(f, 0) == (resource == null ? 0 : resource.data.get(f, 0)); }
+
+    match /profiles/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if isAdmin() || (request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'updatedAt', 'wins', 'lastWin', 'rk', 'st', 'dm', 'co'])
+        && keep('dm') && keep('co')
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 16
+        && (!('wins' in request.resource.data) || (request.resource.data.wins is int && request.resource.data.wins >= 0))
+        && (!('rk' in request.resource.data) || (request.resource.data.rk is int && request.resource.data.rk >= 0 && request.resource.data.rk <= 15))
+        && (!('st' in request.resource.data) || (request.resource.data.st is int && request.resource.data.st >= 0)));
+      allow delete: if isAdmin();
+
+      match /friends/{fid} {
+        allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+        allow create, update, delete: if request.auth != null && (request.auth.uid == uid || request.auth.uid == fid || isAdmin());
+      }
+    }
+
+    match /leaderboard/{doc} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['entries', 'updatedAt'])
+        && request.resource.data.entries is list
+        && request.resource.data.entries.size() <= 10;
+      allow delete: if false;
+    }
+
+    match /requests/{id} {
+      allow read: if request.auth != null && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.from == request.auth.uid;
+      allow delete: if request.auth != null && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow update: if false;
+    }
+
+    match /rankQueue/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == id
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.open == true
+        && request.resource.data.code is string && request.resource.data.code.size() == 4;
+      allow update: if request.auth != null && (
+        (request.auth.uid == id && request.resource.data.uid == request.auth.uid)
+        || (resource.data.open == true && request.resource.data.open == false
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['open', 'guest'])));
+      allow delete: if request.auth != null && (request.auth.uid == id || isAdmin());
+    }
+
+    match /invites/{id} {
+      allow read: if request.auth != null && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.from == request.auth.uid;
+      allow delete: if request.auth != null && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow update: if false;
+    }
+  }
+}
+`;
+</script>
+</body>
+</html>
